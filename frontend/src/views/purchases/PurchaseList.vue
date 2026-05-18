@@ -22,14 +22,24 @@
       </el-table-column>
       <el-table-column prop="created_at" label="创建时间" width="170" />
       <el-table-column prop="user_id" label="操作人ID" width="90" />
+      <el-table-column label="操作" width="140" fixed="right">
+        <template #default="{ row }">
+          <el-button type="success" size="small" :disabled="row.book_status !== 'unpaid'" @click="handlePay(row)">
+            付款
+          </el-button>
+          <el-button type="danger" size="small" :disabled="row.book_status !== 'unpaid'" @click="handleReturn(row)">
+            退货
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { checkPurchases } from '../../api/purchases'
-import { ElMessage } from 'element-plus'
+import { checkPurchases, payPurchase, returnPurchase } from '../../api/purchases'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const loading = ref(false)
 const orders = ref([])
@@ -43,6 +53,36 @@ function statusType(s) { return typeMap[s] || 'info' }
 onMounted(() => {
   loadOrders()
 })
+
+async function handlePay(row) {
+  try {
+    await ElMessageBox.confirm(`确认对订单号 ${row.order_id} 付款？金额：${row.buy_price * row.purchase_quantity}`, '确认付款', { type: 'info' })
+  } catch (e) {
+    return
+  }
+  try {
+    await payPurchase({ order_id: row.order_id })
+    ElMessage.success('付款成功')
+    loadOrders()
+  } catch (e) {
+    // handled by interceptor
+  }
+}
+
+async function handleReturn(row) {
+  try {
+    await ElMessageBox.confirm(`确认对订单号 ${row.order_id} 进行退货？`, '确认退货', { type: 'warning' })
+  } catch (e) {
+    return
+  }
+  try {
+    await returnPurchase({ order_id: row.order_id })
+    ElMessage.success('退货成功')
+    loadOrders()
+  } catch (e) {
+    // handled by interceptor
+  }
+}
 
 async function loadOrders() {
   loading.value = true
