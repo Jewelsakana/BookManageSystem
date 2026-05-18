@@ -11,3 +11,7 @@ export function updateBook(data) {
 export function addBook(params) {
   return request.put('/book/add', null, { params })
 }
+
+export function searchAllBooks() {
+  return request.get('/book/search/all')
+}

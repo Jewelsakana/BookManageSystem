@@ -20,6 +20,9 @@
       <el-form-item label="新密码">
         <el-input v-model="form.password" type="password" placeholder="留空则不修改" show-password />
       </el-form-item>
+      <el-form-item v-if="form.password" label="旧密码">
+        <el-input v-model="form.oldPassword" type="password" placeholder="修改密码需验证旧密码" show-password />
+      </el-form-item>
       <el-form-item label="真实姓名">
         <el-input v-model="form.real_name" placeholder="真实姓名" clearable />
       </el-form-item>
@@ -53,6 +56,7 @@ const targetUserId = ref(null)
 const form = reactive({
   username: '',
   password: '',
+  oldPassword: '',
   real_name: '',
   age: null,
   gender: ''
@@ -68,6 +72,7 @@ function loadSelf() {
   form.age = userStore.user?.age || null
   form.gender = userStore.user?.gender || ''
   form.password = ''
+  form.oldPassword = ''
 }
 
 async function loadUser() {
@@ -85,6 +90,7 @@ async function loadUser() {
     form.age = u.age || null
     form.gender = u.gender || ''
     form.password = ''
+    form.oldPassword = ''
     ElMessage.success('用户信息加载成功')
   } catch (e) {
     // handled by interceptor
@@ -98,7 +104,10 @@ async function handleUpdate() {
     target_user_id: userStore.isSuperAdmin && targetUserId.value ? targetUserId.value : userStore.user?.user_id
   }
   if (form.username) data.username = form.username
-  if (form.password) data.password = form.password
+  if (form.password) {
+    data.password = form.password
+    if (form.oldPassword) data.old_password = form.oldPassword
+  }
   if (form.real_name) data.real_name = form.real_name
   if (form.age !== null && form.age !== undefined) data.age = form.age
   if (form.gender) data.gender = form.gender
@@ -115,6 +124,7 @@ async function handleUpdate() {
       localStorage.setItem('user', JSON.stringify(userStore.user))
     }
     form.password = ''
+    form.oldPassword = ''
   } catch (e) {
     // handled by interceptor
   } finally {

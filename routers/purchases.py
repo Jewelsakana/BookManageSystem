@@ -146,3 +146,25 @@ async def return_purchase(
     return {
         "message":"退货成功"
     }
+
+# 超级管理员查看所有的订单,普通管理员查看与自己相关的订单
+@router.get("/check")
+async def check_all_purchase(
+        current_user_id: int = Depends(get_current_user),
+        db: AsyncSession = Depends(get_database)
+):
+    # 判断登录状态
+    operator = await db.get(User, current_user_id)
+    if not operator:
+        raise HTTPException(status_code=401, detail="用户不存在或未登录")
+
+    if operator.user_role != "super_admin":
+        results = await db.execute(select(Purchase).where(Purchase.user_id == operator.user_id))
+    else:
+        results =await db.execute(select(Purchase))
+    purchases = results.scalars().all()
+
+    if purchases is None:
+        raise HTTPException(status_code=404,detail="没有订单")
+
+    return purchases

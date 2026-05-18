@@ -19,7 +19,8 @@ class UserRegister(BaseModel):
 class UserUpdate(BaseModel):
     target_user_id: int = Field(description="想要修改的目标用户ID")
     username: Optional[str] = Field(default=None, max_length=30, description="用户名")
-    password: Optional[str] = Field(default=None, max_length=40, description="密码")
+    old_password: Optional[str] = Field(default=None, max_length=40, description="旧密码")
+    password: Optional[str] = Field(default=None, max_length=40, description="新密码")
     real_name: Optional[str] = Field(default=None, max_length=30, description="真实姓名")
     age: Optional[int] = Field(default=None, ge=0, le=120, description="年龄")
     gender: Optional[Literal['male', 'female']] = Field(default=None, description="性别")

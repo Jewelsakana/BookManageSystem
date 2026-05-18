@@ -55,6 +55,7 @@ class Sale(Base):
     sale_quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     sold_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.user_id", ondelete="CASCADE", onupdate="CASCADE"), nullable=False)
+    sale_status:Mapped[str] = mapped_column(String(10),nullable=False,server_default=text("'completed'"))
 
 
 # 财务账单表

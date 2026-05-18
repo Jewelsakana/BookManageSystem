@@ -11,3 +11,7 @@ export function payPurchase(params) {
 export function returnPurchase(params) {
   return request.put('/purchase/return', null, { params })
 }
+
+export function checkPurchases() {
+  return request.get('/purchase/check')
+}

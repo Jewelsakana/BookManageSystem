@@ -108,6 +108,10 @@ async def user_update(user_update:UserUpdate,
         user.username = user_update.username
 
     if user_update.password is not None:
+        if user_update.old_password is None:
+            raise HTTPException(status_code=400,detail="旧密码为空")
+        if user.user_password != get_md5(user_update.old_password):
+            raise HTTPException(status_code=400,detail="旧密码必须正确")
         user.user_password = get_md5(user_update.password)
 
     if user_update.real_name is not  None:

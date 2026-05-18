@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
         component: () => import('../views/books/BookSearch.vue')
       },
       {
+        path: 'books/list',
+        name: 'BookList',
+        component: () => import('../views/books/BookList.vue')
+      },
+      {
         path: 'books/update',
         name: 'BookUpdate',
         component: () => import('../views/books/BookUpdate.vue')
@@ -37,6 +43,11 @@ const routes = [
         path: 'purchases/add',
         name: 'PurchaseAdd',
         component: () => import('../views/purchases/PurchaseAdd.vue')
+      },
+      {
+        path: 'purchases/list',
+        name: 'PurchaseList',
+        component: () => import('../views/purchases/PurchaseList.vue')
       },
       {
         path: 'purchases/pay',
@@ -54,9 +65,20 @@ const routes = [
         component: () => import('../views/sales/SaleBook.vue')
       },
       {
+        path: 'sales/list',
+        name: 'SaleList',
+        component: () => import('../views/sales/SaleList.vue')
+      },
+      {
         path: 'bills/check',
         name: 'BillCheck',
         component: () => import('../views/bills/BillCheck.vue')
+      },
+      {
+        path: 'bills/summary',
+        name: 'BillSummary',
+        component: () => import('../views/bills/BillSummary.vue'),
+        meta: { role: 'super_admin' }
       },
       {
         path: 'users/list',
@@ -86,10 +108,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+
   if (to.meta.requiresAuth !== false && !token) {
     next('/login')
   } else if (to.path === '/login' && token) {
     next('/dashboard')
+  } else if (to.meta.role === 'super_admin' && user?.user_role !== 'super_admin') {
+    next('/dashboard')
+    ElMessage.warning('仅超级管理员可访问')
   } else {
     next()
   }

@@ -10,6 +10,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleCheck" :loading="loading">查询</el-button>
+        <el-button v-if="userStore.isSuperAdmin" type="warning" @click="handleCheckAll" :loading="loadingAll">查看所有账单</el-button>
       </el-form-item>
     </el-form>
 
@@ -17,9 +18,9 @@
       <el-table-column prop="bill_id" label="账单号" width="80" />
       <el-table-column prop="bill_type" label="类型" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.bill_type === 'income' ? 'success' : 'danger'">
-            {{ row.bill_type === 'income' ? '收入' : '支出' }}
-          </el-tag>
+          <el-tag v-if="row.bill_type === 'income'" type="success">收入</el-tag>
+          <el-tag v-else-if="row.bill_type === 'refund'" type="warning">退款</el-tag>
+          <el-tag v-else type="danger">支出</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="amount" label="金额" width="120" />
@@ -31,10 +32,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import { checkBills } from '../../api/bills'
+import { checkBills, checkAllBills } from '../../api/bills'
+import { useUserStore } from '../../stores/user'
 import { ElMessage } from 'element-plus'
 
+const userStore = useUserStore()
 const loading = ref(false)
+const loadingAll = ref(false)
 const first_time = ref('')
 const last_time = ref('')
 const bills = ref([])
@@ -57,6 +61,23 @@ async function handleCheck() {
     bills.value = []
   } finally {
     loading.value = false
+  }
+}
+
+async function handleCheckAll() {
+  loadingAll.value = true
+  try {
+    const res = await checkAllBills()
+    bills.value = res.data
+    if (res.data.length === 0) {
+      ElMessage.info('无账单记录')
+    } else {
+      ElMessage.success(`共 ${res.data.length} 条账单`)
+    }
+  } catch (e) {
+    bills.value = []
+  } finally {
+    loadingAll.value = false
   }
 }
 </script>

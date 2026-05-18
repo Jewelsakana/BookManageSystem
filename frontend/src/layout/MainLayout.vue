@@ -23,6 +23,7 @@
             <span>图书管理</span>
           </template>
           <el-menu-item index="/books/search">图书查询</el-menu-item>
+          <el-menu-item index="/books/list">图书列表</el-menu-item>
           <el-menu-item index="/books/update">图书修改</el-menu-item>
           <el-menu-item index="/books/add">添加新书</el-menu-item>
         </el-sub-menu>
@@ -33,18 +34,28 @@
             <span>进货管理</span>
           </template>
           <el-menu-item index="/purchases/add">创建进货单</el-menu-item>
+          <el-menu-item index="/purchases/list">订单查询</el-menu-item>
           <el-menu-item index="/purchases/pay">进货付款</el-menu-item>
           <el-menu-item index="/purchases/return">进货退货</el-menu-item>
         </el-sub-menu>
 
-        <el-menu-item index="/sales/book">
-          <el-icon><Sell /></el-icon>
-          <span>销售管理</span>
-        </el-menu-item>
+        <el-sub-menu index="sales">
+          <template #title>
+            <el-icon><Sell /></el-icon>
+            <span>销售管理</span>
+          </template>
+          <el-menu-item index="/sales/book">图书购买</el-menu-item>
+          <el-menu-item index="/sales/list">销售记录</el-menu-item>
+        </el-sub-menu>
 
         <el-menu-item index="/bills/check">
           <el-icon><Money /></el-icon>
-          <span>财务管理</span>
+          <span>账单查询</span>
+        </el-menu-item>
+
+        <el-menu-item v-if="userStore.isSuperAdmin" index="/bills/summary">
+          <el-icon><DataAnalysis /></el-icon>
+          <span>收支汇总</span>
         </el-menu-item>
 
         <el-sub-menu index="users" v-if="userStore.isSuperAdmin">

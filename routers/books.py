@@ -51,6 +51,26 @@ async def search_books(
 
     return books
 
+# 查看所有图书接口
+@router.get("/search/all")
+async def search_all_books(
+        current_user_id: int = Depends(get_current_user),
+        db: AsyncSession = Depends(get_database)
+):
+    # 判断登录状态
+    operator = await db.get(User,current_user_id)
+    if not operator:
+        raise HTTPException(status_code=401, detail="用户不存在或未登录")
+
+    # 检查所有的书籍
+    results = await db.execute(select(Book))
+    books = results.scalars().all()
+
+    if books is None:
+        raise HTTPException(status_code=404,detail="未存在书籍")
+
+    return books
+
 # 图书修改接口
 @router.put("/update")
 async def update_books(

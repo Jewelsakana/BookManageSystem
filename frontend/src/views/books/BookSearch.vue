@@ -30,7 +30,13 @@
       <el-table-column prop="author" label="作者" width="120" />
       <el-table-column prop="publisher" label="出版社" width="150" />
       <el-table-column prop="price" label="零售价" width="100" />
-      <el-table-column prop="stock_quantity" label="库存" width="80" />
+      <el-table-column label="库存" width="90">
+        <template #default="{ row }">
+          <el-tag v-if="row.stock_quantity === 0" type="info">已售罄</el-tag>
+          <el-tag v-else-if="row.stock_quantity <= STOCK_ALERT" type="danger">{{ row.stock_quantity }} 本</el-tag>
+          <span v-else style="color: #67c23a">{{ row.stock_quantity }} 本</span>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -42,6 +48,8 @@ import { ElMessage } from 'element-plus'
 
 const loading = ref(false)
 const books = ref([])
+
+const STOCK_ALERT = 5
 
 const form = reactive({
   book_id: '',
